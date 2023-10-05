@@ -33,7 +33,7 @@ function createReducers() {
 }
 
 function createExtraActions() {
-  const baseUrl = `http://localhost:5000`;
+  const baseUrl = `http://localhost:5000`; // http://188.24.131.206:6969
   return {
     login: login(),
     register: register()
