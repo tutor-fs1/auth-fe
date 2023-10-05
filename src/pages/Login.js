@@ -26,6 +26,7 @@ function Login() {
     email: Yup.string().required('Email is required'),
     pass: Yup.string().required('Password is required')
   });
+
   const formOptions = { resolver: yupResolver(validationSchema) };
 
   // get functions to build form with useForm() hook

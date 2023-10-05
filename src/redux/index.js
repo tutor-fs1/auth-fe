@@ -44,6 +44,8 @@ function createExtraActions() {
       async ({ email, pass }) => await fetchWrapper.post(`${baseUrl}/login`, { email, pass })
     );
   };
+
+
   function register() {
     return createAsyncThunk(
       `${name}/register`,
