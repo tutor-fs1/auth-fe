@@ -1,0 +1,1 @@
+export const baseURL = 'http://localhost:5000'; // http://188.24.131.206:6969

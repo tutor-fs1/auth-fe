@@ -1,3 +1,4 @@
+import { baseURL } from '.';
 import { store, authActions } from '../redux';
 
 export const fetchWrapper = {
@@ -23,11 +24,11 @@ function request(method) {
 
 // helper functions
 
-function authHeader(url) {
+export function authHeader(url) {
   // return auth header with jwt if user is logged in and request is to the api url
   const token = authToken();
   const isLoggedIn = !!token;
-  const isApiUrl = url.startsWith(process.env.REACT_APP_API_URL);
+  const isApiUrl = url.startsWith(baseURL);
   if (isLoggedIn && isApiUrl) {
     return { Authorization: `Bearer ${token}` };
   } else {
@@ -36,6 +37,8 @@ function authHeader(url) {
 }
 
 function authToken() {
+  console.log(store.getState().auth.user);
+
   return store.getState().auth.user?.token;
 }
 

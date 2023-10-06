@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetchWrapper } from '../helpers/fetch-wrapper';
 import { history } from '../helpers/history';
+import { baseURL } from '../helpers';
 
 // create slice
 const name = 'auth';
@@ -33,7 +34,6 @@ function createReducers() {
 }
 
 function createExtraActions() {
-  const baseUrl = `http://localhost:5000`; // http://188.24.131.206:6969
   return {
     login: login(),
     register: register()
@@ -41,7 +41,7 @@ function createExtraActions() {
   function login() {
     return createAsyncThunk(
       `${name}/login`,
-      async ({ email, pass }) => await fetchWrapper.post(`${baseUrl}/login`, { email, pass })
+      async ({ email, pass }) => await fetchWrapper.post(`${baseURL}/login`, { email, pass })
     );
   };
 
@@ -49,7 +49,7 @@ function createExtraActions() {
   function register() {
     return createAsyncThunk(
       `${name}/register`,
-      async ({ email, pass }) => await fetchWrapper.post(`${baseUrl}/register`, { email, pass })
+      async ({ email, pass }) => await fetchWrapper.post(`${baseURL}/register`, { email, pass })
     );
   }
 
@@ -70,7 +70,7 @@ function createExtraReducers() {
         state.error = null;
       },
       [fulfilled]: (state, action) => {
-        const user = action.payload;
+        const user = action.payload.user;
         // store user details and jwt token in local storage to keep user logged in between page refreshes
         localStorage.setItem('user', JSON.stringify(user));
         state.user = user;
