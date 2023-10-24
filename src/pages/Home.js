@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from "react-hook-form";
@@ -7,6 +7,7 @@ import { authHeader, fetchWrapper } from '../helpers/fetch-wrapper';
 import { baseURL } from '../helpers';
 
 function Home() {
+  const [tasks, setTasks] = useState([]);
   const authUser = useSelector(x => x.auth.user);
   // form validation rules 
   const validationSchema = Yup.object().shape({
@@ -17,12 +18,27 @@ function Home() {
   const { register, handleSubmit, formState } = useForm(formOptions);
 
   const { errors, isSubmitting } = formState;
-  const localData = JSON.parse(localStorage.getItem('user'));
+  // const localData = JSON.parse(localStorage.getItem('user'));
 
   const onAdd = ({ text }) => {
-    fetchWrapper.post(`${baseURL}/tasks`, { text, userId: authUser.id });
+    fetchWrapper.post(`${baseURL}/tasks`, { text, userId: authUser.id }).then((res) => {
+      setTasks(oldTasks => {
+        return [...oldTasks, res];
+      })
+    });
+  }
+  const handleDelete = (taskId) => {
+    fetchWrapper.delete(`${baseURL}/tasks/${taskId}`).then(() => {
+      setTasks((oldTasks) => {
+        const newTasks = oldTasks.filter((t) => t._id !== taskId);
+        return newTasks;
+      });
+    });
   }
   // get functions to build form with useForm() hook
+  useEffect(() => {
+    fetchWrapper.get(`${baseURL}/tasks`).then(res => setTasks(res));
+  }, []);
   return (
     <div className="col-md-6 offset-md-3 mt-5">
       <div className="card">
@@ -34,14 +50,21 @@ function Home() {
               <input name="text" type="text" {...register('text')} className={`form-control ${errors.text ? 'is-invalid' : ''}`} />
               <div className="invalid-feedback">{errors.text?.message}</div>
             </div>
-            <button disabled={isSubmitting} className="btn btn-primary">
+            <button disabled={isSubmitting} className="btn btn-primary mb-1">
               {isSubmitting && <span className="spinner-border spinner-border-sm mr-1"></span>}
               Add task
             </button>
-            {/* {authError &&
-              <div className="alert alert-danger mt-3 mb-0">{authError.message}</div>
-            } */}
           </form>
+          <div className='task-list'>
+            {tasks.length > 0 &&
+              tasks.map(t => {
+                return <div className='task-item'>
+                  <span className='task-text'>{t.text}</span>
+                  <button onClick={() => handleDelete(t._id)} className='task-delete btn btn-danger'>Delete</button>
+                </div>
+              })
+            }
+          </div>
         </div>
       </div>
     </div>
